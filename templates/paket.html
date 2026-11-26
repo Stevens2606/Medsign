@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Paket Layanan{% endblock %}
+{% block content %}
+<section>
+  <div class="container">
+    <div class="section-title"><h2>Paket Layanan</h2><p>Cek keaslian citra selalu gratis untuk siapa saja. Paket hanya dibutuhkan untuk menandatangani citra.</p></div>
+    <div class="grid-3">
+      <div class="card price-card">
+        <span class="badge ok">Untuk mencoba</span><h3>Coba Gratis</h3><div class="price">Gratis</div>
+        <ul><li>5 citra</li><li>Berlaku 7 hari</li><li>Tanda tangan hibrida ECDSA + ML-DSA</li><li>Cek keaslian & QR code</li></ul>
+        {% if user %}<span class="btn btn-outline btn-block" style="cursor:default">Otomatis saat daftar</span>
+        {% else %}<a class="btn btn-outline btn-block" href="{{ url_for('register') }}">Daftar Gratis</a>{% endif %}
+      </div>
+      <div class="card price-card featured">
+        <span class="badge warn">Promo soft launch</span><h3>Starter</h3><div class="price">Rp25.000<small style="font-size:14px;color:var(--muted)"> / 1 bulan</small></div>
+        <ul><li>30 citra</li><li>Berlaku 1 bulan</li><li>Untuk tenaga & mahasiswa kesehatan, praktik kecil</li><li>Panduan pemakaian via WhatsApp</li></ul>
+        <a class="btn btn-teal btn-block" href="{{ beli_url('starter', user.email if user else '') }}" target="_blank" rel="noopener">Beli Paket</a>
+      </div>
+      <div class="card price-card">
+        <span class="badge info">Fasyankes</span><h3>Mitra Uji Coba</h3><div class="price">Gratis</div>
+        <ul><li>Untuk klinik/RS mitra uji coba</li><li>300 citra/bulan selama 3 bulan</li><li>Diaktifkan tim setelah kesepakatan</li></ul>
+        <a class="btn btn-outline btn-block" href="{{ beli_url('uji_coba', user.email if user else '') }}" target="_blank" rel="noopener">Ajukan Kemitraan</a>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:18px">
+      <div class="card price-card">
+        <span class="badge info">Klinik</span><h3>Klinik</h3><div class="price">Rp350.000<small style="font-size:14px;color:var(--muted)">/bulan</small></div>
+        <ul><li>Maksimal 500 citra/bulan</li><li>3 akun pengguna</li><li>Riwayat & log audit</li><li>Bantuan via WhatsApp</li></ul>
+        <a class="btn btn-outline btn-block" href="{{ beli_url('klinik', user.email if user else '') }}" target="_blank" rel="noopener">Hubungi Kami</a>
+      </div>
+      <div class="card price-card">
+        <span class="badge info">Rumah Sakit</span><h3>Rumah Sakit</h3><div class="price">Rp750.000<small style="font-size:14px;color:var(--muted)">/bulan</small></div>
+        <ul><li>Maksimal 2.000 citra/bulan</li><li>10 akun pengguna</li><li>Tanda tangan massal & API SIMRS (segera)</li><li>Pendampingan pemasangan</li></ul>
+        <a class="btn btn-outline btn-block" href="{{ beli_url('rumah_sakit', user.email if user else '') }}" target="_blank" rel="noopener">Hubungi Kami</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <h3 style="margin:0 0 12px">Cara membeli paket</h3>
+      <div class="steps">
+        <div class="step"><div class="step-no">1</div><div><b>Daftar akun</b><p>Buat akun di MedSign PQ dengan email Anda.</p></div></div>
+        <div class="step"><div class="step-no">2</div><div><b>Pesan & bayar</b><p>Klik <b>Beli Paket</b>, isi data pemesanan, lalu bayar lewat QRIS, e-wallet, atau transfer bank.</p></div></div>
+        <div class="step"><div class="step-no">3</div><div><b>Paket diaktifkan</b><p>Tim mengecek bukti bayar, mengaktifkan paket di akun Anda, lalu mengirim kwitansi lewat WhatsApp.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

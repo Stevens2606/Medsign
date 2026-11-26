@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-head">
+    <div><h1>Admin MedSign PQ</h1><p>Aktivasi paket setelah bukti pembayaran dicek, dan catatan penjualan.</p></div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:22px">
+    <div class="kpi"><span>Pengguna terdaftar</span><b>{{ summary.pengguna }}</b></div>
+    <div class="kpi"><span>Transaksi berbayar</span><b>{{ summary.transaksi }}</b></div>
+    <div class="kpi"><span>Total penjualan</span><b>{{ summary.total|rupiah }}</b></div>
+  </div>
+
+  <div class="page-head" style="margin-top:8px">
+    <h3 style="color:var(--navy);margin:0">Pengguna & Aktivasi Paket</h3>
+    <form method="get" class="search">
+      <input type="text" name="q" value="{{ q }}" placeholder="Cari email / nama">
+      <button class="btn btn-outline btn-sm" type="submit">Cari</button>
+    </form>
+  </div>
+  <table>
+    <thead><tr><th>Pengguna</th><th>Paket sekarang</th><th>Kuota</th><th>Aktifkan paket</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td><b>{{ r.u.pic_name }}</b><div class="hint">{{ r.u.email }}<br>{{ r.u.org_name }} · {{ r.u.phone or '-' }}</div></td>
+        <td>{{ r.plan.nama }}
+          {% if r.expired %}<span class="badge bad">Berakhir</span>{% else %}<span class="badge ok">Aktif</span>{% endif %}
+          <div class="hint">s.d. {{ r.u.plan_until|tgl }}</div></td>
+        <td>{{ r.used }} / {{ r.plan.kuota }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_activate', uid=r.u.id) }}" class="act-form">
+            <select name="plan">
+              {% for key, p in PLANS.items() %}<option value="{{ key }}" {{ 'selected' if key=='starter' }}>{{ p.nama }} ({{ p.harga }})</option>{% endfor %}
+            </select>
+            <select name="metode" required>
+              <option value="">Metode bayar</option>
+              {% for m in metode_list %}<option>{{ m }}</option>{% endfor %}
+            </select>
+            <input type="text" name="catatan" placeholder="Catatan (opsional)">
+            <button class="btn btn-teal btn-sm" type="submit">Aktifkan</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="empty">Tidak ada pengguna.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 style="color:var(--navy);margin:28px 0 12px">Catatan Penjualan & Aktivasi</h3>
+  {% if sales %}
+  <table>
+    <thead><tr><th>No</th><th>Tanggal</th><th>Pembeli</th><th>Paket</th><th>Harga</th><th>Metode</th><th>Catatan</th></tr></thead>
+    <tbody>
+    {% for s in sales %}
+      <tr>
+        <td>{{ loop.revindex }}</td>
+        <td>{{ s.activated_at|tgl }}</td>
+        <td><b>{{ s.pic_name }}</b><div class="hint">{{ s.email }} · {{ s.org_name }}</div></td>
+        <td>{{ PLANS[s.plan].nama }}</td>
+        <td>{{ s.harga_rp|rupiah }}</td>
+        <td>{{ s.metode }}</td>
+        <td>{{ s.catatan or '-' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="card empty">Belum ada aktivasi paket.</div>
+  {% endif %}
+</div>
+{% endblock %}

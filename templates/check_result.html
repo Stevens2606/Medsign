@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Hasil Cek Keaslian{% endblock %}
+{% block content %}
+<div class="container" style="max-width:860px">
+  <div class="page-head"><div><h1>Hasil Cek Keaslian</h1><p>File: {{ filename }}</p></div>
+    <a class="btn btn-outline" href="{{ url_for('check') }}">Cek Citra Lain</a></div>
+
+  {% if status == 'valid' %}
+  <div class="result ok"><div class="ico">✓</div><div><h2>ASLI</h2>
+    <p>Citra tidak berubah sejak ditandatangani, dan kedua tanda tangan (ECDSA dan ML-DSA) valid.</p></div></div>
+  {% elif status == 'modified' %}
+  <div class="result bad"><div class="ico">✕</div><div><h2>TIDAK ASLI — citra telah diubah</h2>
+    <p>Tanda tangan ditemukan, tetapi isi piksel citra sudah berbeda dari saat ditandatangani. Jangan gunakan citra ini untuk diagnosis; minta file asli ke fasyankes pengirim.</p></div></div>
+  {% elif status == 'invalid' %}
+  <div class="result bad"><div class="ico">✕</div><div><h2>TIDAK ASLI — tanda tangan tidak valid</h2>
+    <p>Data tanda tangan di dalam file rusak atau dipalsukan. Jangan gunakan citra ini; minta file asli ke fasyankes pengirim.</p></div></div>
+  {% elif status == 'unknown' %}
+  <div class="result warn"><div class="ico">!</div><div><h2>Penandatangan tidak dikenal</h2>
+    <p>File berisi data tanda tangan, tetapi ID tanda tangan atau fasyankes tidak terdaftar di MedSign PQ.</p></div></div>
+  {% else %}
+  <div class="result warn"><div class="ico">?</div><div><h2>Tanda tangan tidak ditemukan di file ini</h2>
+    <p>Keaslian citra belum bisa dipastikan. Ini <b>belum tentu</b> berarti citranya palsu.</p></div></div>
+
+  <div class="card" style="margin-top:16px">
+    {% if is_jpg %}
+    <div class="flash info" style="margin-bottom:14px">File yang diunggah berformat <b>JPG</b>. Citra dari MedSign PQ selalu berformat <b>PNG</b>, jadi file ini kemungkinan sudah diubah formatnya atau dikompres.</div>
+    {% endif %}
+    <h3 style="margin:0 0 10px;color:var(--navy)">Kemungkinan penyebab</h3>
+    <ul class="reason-list">
+      <li><b>Dikirim sebagai foto lewat WhatsApp/Instagram/Telegram.</b> Aplikasi chat mengompres foto sehingga tanda tangan di dalam file ikut terhapus.</li>
+      <li><b>Hasil screenshot, diedit, atau disimpan ulang</b> dengan aplikasi lain.</li>
+      <li><b>Citra memang belum pernah ditandatangani</b> dengan MedSign PQ.</li>
+    </ul>
+    <h3 style="margin:16px 0 10px;color:var(--navy)">Yang bisa dilakukan</h3>
+    <ol class="reason-list">
+      <li>Minta pengirim mengirim ulang <b>file PNG asli</b> dari MedSign PQ sebagai <b>Dokumen</b> (WhatsApp: Lampirkan → Dokumen), email, atau flashdisk.</li>
+      <li>Unggah lagi file yang baru diterima di halaman <a href="{{ url_for('check') }}">Cek Keaslian</a>.</li>
+      <li>Jika pengirim membagikan tautan atau QR code cek, buka tautan itu untuk memastikan ID tanda tangannya terdaftar.</li>
+    </ol>
+  </div>
+  {% endif %}
+
+  {% if result %}
+  <div class="checks">
+    <div class="check-item"><b>Keutuhan piksel</b>{% if result.hash_ok %}<span class="badge ok">Cocok</span>{% else %}<span class="badge bad">Berubah</span>{% endif %}</div>
+    <div class="check-item"><b>Tanda tangan ECDSA</b>{% if result.ecdsa_ok %}<span class="badge ok">Valid</span>{% else %}<span class="badge bad">Tidak valid</span>{% endif %}</div>
+    <div class="check-item"><b>Tanda tangan ML-DSA</b>{% if result.mldsa_ok %}<span class="badge ok">Valid</span>{% else %}<span class="badge bad">Tidak valid</span>{% endif %}</div>
+  </div>
+  {% endif %}
+
+  {% if payload %}
+  <div class="card detail">
+    <dl>
+      <dt>ID tanda tangan</dt><dd class="mono">{{ payload.sid }}</dd>
+      <dt>Ditandatangani oleh</dt><dd>{{ signer.org_name if signer else payload.signer_name }}{% if signer %} ({{ signer.org_type }}){% endif %}</dd>
+      <dt>Waktu tanda tangan</dt><dd>{{ payload.signed_at|tgl }}</dd>
+      {% if record and record.description %}<dt>Keterangan</dt><dd>{{ record.description }}</dd>{% endif %}
+    </dl>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

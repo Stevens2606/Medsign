@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Citra Ditandatangani{% endblock %}
+{% block content %}
+<div class="container" style="max-width:860px">
+  <div class="page-head"><div><h1>Citra berhasil ditandatangani</h1><p>Ikuti 3 langkah di bawah agar dokter rujukan bisa mengecek keaslian citra ini.</p></div></div>
+  <div class="result ok">
+    <div class="ico">✓</div>
+    <div><h2>{{ row.id }}</h2><p>{{ row.filename }} · {{ row.width }}×{{ row.height }} px · {{ row.signed_at|tgl }}</p></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin:0 0 12px;color:var(--navy)">Langkah selanjutnya</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-no">1</div>
+        <div><b>Unduh PNG bertanda tangan</b>
+          <p>Tanda tangan tersimpan di dalam file ini. Jangan disimpan ulang atau diedit.</p>
+          <a class="btn btn-teal btn-sm" href="{{ url_for('download', sid=row.id) }}">Unduh PNG</a></div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div><b>Kirim sebagai Dokumen, bukan Foto</b>
+          <p>Di WhatsApp pilih <b>Lampirkan → Dokumen</b>. Kalau dikirim sebagai foto, WhatsApp mengompres citra sehingga tanda tangannya hilang. Email dan flashdisk aman.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div><b>Bagikan tautan atau QR code cek</b>
+          <p>Penerima membuka tautan ini lalu mengunggah PNG yang diterima untuk mengecek keasliannya.</p>
+          <div class="copy"><input type="text" id="link" value="{{ check_url }}" readonly><button type="button" class="btn btn-outline btn-sm" data-copy="link">Salin</button></div>
+        </div>
+      </div>
+    </div>
+    {% if qr %}
+    <div class="qr-box">
+      <img src="{{ qr }}" alt="QR code tautan cek keaslian {{ row.id }}">
+      <div><b>QR code tautan cek</b><p class="hint" style="margin:4px 0 0">Bisa dicetak atau ditempel di surat rujukan. Pindai dengan kamera HP untuk membuka halaman cek.</p></div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card detail">
+    <dl>
+      <dt>Ditandatangani oleh</dt><dd>{{ user.org_name }}</dd>
+      <dt>Algoritma</dt><dd>ECDSA P-256 + ML-DSA-65 (hibrida)</dd>
+      <dt>Hash citra (SHA3-256)</dt><dd class="mono">{{ row.image_hash }}</dd>
+      <dt>Keterangan</dt><dd>{{ row.description or '-' }}</dd>
+    </dl>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+    <a class="btn btn-outline" href="{{ url_for('sign') }}">Tandatangani Citra Lain</a>
+    <a class="btn btn-outline" href="{{ url_for('dashboard') }}">Ke Dashboard</a>
+  </div>
+</div>
+{% endblock %}
